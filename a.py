@@ -1,3 +1,9 @@
+"""
+IoT Environmental Monitoring Dashboard
+Predictive Analytics & Spatial Visualization
+Research Project: OMO/RE/323
+"""
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -549,12 +555,13 @@ def display_csv_input(system):
             st.write("File Preview:")
             st.dataframe(df.head(10), use_container_width=True)
             
-            col1, col2, col3 = st.columns([1, 1, 1])
+            col1, col2 = st.columns([1, 1])
             with col1:
                 if st.button("Process CSV Data", use_container_width=True):
                     processed = 0
                     errors = 0
                     progress_bar = st.progress(0)
+                    status_text = st.empty()
                     
                     for idx, row in df.iterrows():
                         try:
@@ -585,6 +592,7 @@ def display_csv_input(system):
                             errors += 1
                         
                         progress_bar.progress((idx + 1) / len(df))
+                        status_text.text(f"Processing: {idx + 1}/{len(df)}")
                     
                     st.success(f"Successfully processed {processed} records ({errors} errors)")
                     st.rerun()
@@ -682,8 +690,7 @@ def display_current_status(system, df):
     
     with col2:
         pm25_status, _ = system.get_warning_level('Dust_PM_ugm3', latest['Dust_PM_ugm3'])
-        status_class = f"warning-{pm25_status}" if pm25_status != 'unknown' else "moderate-warning"
-        status_class = status_class.replace('warning-', '') + '-warning'
+        status_class = pm25_status + "-warning" if pm25_status != 'unknown' else "moderate-warning"
         st.markdown(f"""
         <div class="metric-card">
             <div style="font-size: 0.9rem; color: #64748b;">PM2.5</div>
@@ -694,8 +701,7 @@ def display_current_status(system, df):
     
     with col3:
         temp_status, _ = system.get_warning_level('Temperature_C', latest['Temperature_C'])
-        status_class = f"warning-{temp_status}" if temp_status != 'unknown' else "moderate-warning"
-        status_class = status_class.replace('warning-', '') + '-warning'
+        status_class = temp_status + "-warning" if temp_status != 'unknown' else "moderate-warning"
         st.markdown(f"""
         <div class="metric-card">
             <div style="font-size: 0.9rem; color: #64748b;">Temperature</div>
@@ -706,8 +712,7 @@ def display_current_status(system, df):
     
     with col4:
         humid_status, _ = system.get_warning_level('Humidity_RH', latest['Humidity_RH'])
-        status_class = f"warning-{humid_status}" if humid_status != 'unknown' else "moderate-warning"
-        status_class = status_class.replace('warning-', '') + '-warning'
+        status_class = humid_status + "-warning" if humid_status != 'unknown' else "moderate-warning"
         st.markdown(f"""
         <div class="metric-card">
             <div style="font-size: 0.9rem; color: #64748b;">Humidity</div>
